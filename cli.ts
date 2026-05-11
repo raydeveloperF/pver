@@ -15,6 +15,7 @@ interface ReleaseOptions {
   versionpy?: boolean
   versionrb?: boolean
   mdfile?: string
+  preparedVersion?: boolean
 }
 
 if (process.env.NPM_TOKEN && !process.env.NODE_AUTH_TOKEN) {
@@ -82,6 +83,11 @@ yargs(hideBin(process.argv))
         })
         .option("no-push-main", {
           describe: "Disable pushing to main branch (overrides --push-main)",
+          type: "boolean",
+        })
+        .option("prepared-version", {
+          describe:
+            "Release the version already committed in package.json when it has no matching git tag",
           type: "boolean",
         })
         .option("readme", {

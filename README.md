@@ -72,6 +72,7 @@ pver release --git --package-json --readme
 pver release --git --npm --readme
 
 # Also available: --pyproject, --setuppy, --versionpy, --versionrb,
+#                 --prepared-version,
 #                 --mdfile somefile.md
 
 # Use --package-json when you only need the local version bump without an npm publish.
@@ -86,6 +87,7 @@ pver release bigrelease --git
 pver stage --git
 pver stage increment --git --npm
 pver stage --package-json --readme
+pver stage --package-json --mdfile CHANGELOG.md
 
 # Setup a Github repository to automatically release with pragmatic versions
 pver setup github
@@ -151,14 +153,14 @@ jobs:
           node-version: 20
           registry-url: https://registry.npmjs.org/
       - run: npm ci
-      - run: npx pver release --git --npm --no-push-main
+      - run: npx pver release --git --npm --no-push-main --prepared-version
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 ```
 
-When `package.json` already contains a version that does not have a matching git
-tag yet, `pver release` now treats that version as prepared-but-unreleased and
-publishes it as-is instead of incrementing again.
+With `--prepared-version`, when `package.json` already contains a version that
+does not have a matching git tag yet, `pver release` treats that version as
+prepared-but-unreleased and publishes it as-is instead of incrementing again.
 
 ## Analysis
 

@@ -36,14 +36,16 @@ export const analyze = async (ctx: AppContext): Promise<Analysis> => {
       `Couldn't find current version using --current-method: ${ctx.current_method}[${current_method}]`
     )
 
-  const current_version_is_unreleased = !(await checkIfGitTagExistsForVersion(
-    ctx,
-    current_version
-  ))
+  const current_version_is_unreleased =
+    ctx.prepared_version &&
+    !(await checkIfGitTagExistsForVersion(
+      ctx,
+      current_version
+    ))
 
   if (current_version_is_unreleased) {
     console.log(
-      `Current package version ${current_version} has no matching git tag, releasing it as-is`
+      `Current package version ${current_version} was marked as prepared and has no matching git tag, releasing it as-is`
     )
 
     return {
