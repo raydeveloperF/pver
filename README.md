@@ -27,7 +27,7 @@ normally may notice and should accompany an announcement.
 npm install -g pver
 ```
 
-Then put this in a github workflow:
+Then put this in a github workflow if your release job is allowed to push back to `main`:
 
 ```yml
 name: Publish to npm
@@ -85,6 +85,7 @@ pver release bigrelease --git
 # git history, tag the current commit and stage the changes locally
 pver stage --git
 pver stage increment --git --npm
+pver stage --package-json --readme
 
 # Setup a Github repository to automatically release with pragmatic versions
 pver setup github
@@ -115,6 +116,49 @@ jobs:
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 ```
+
+### Protected Branches
+
+If your default branch is protected and workflow tokens cannot push directly to
+`main`, split version preparation from publishing:
+
+1. In the pull request branch, stage the version files and commit them as part
+   of the PR:
+
+```bash
+pver stage --package-json
+pver stage --package-json --readme
+```
+
+2. Merge that PR into the protected branch.
+
+3. In the publish workflow that runs after the merge, release the already
+   prepared version without pushing back to `main`:
+
+```yml
+name: Publish to npm
+on:
+  push:
+    branches:
+      - main
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org/
+      - run: npm ci
+      - run: npx pver release --git --npm --no-push-main
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+```
+
+When `package.json` already contains a version that does not have a matching git
+tag yet, `pver release` now treats that version as prepared-but-unreleased and
+publishes it as-is instead of incrementing again.
 
 ## Analysis
 

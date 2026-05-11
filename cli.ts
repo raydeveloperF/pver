@@ -115,6 +115,18 @@ yargs(hideBin(process.argv))
           describe: "Stage version in package.json",
           type: "boolean",
         })
+        .option("package-json", {
+          describe: "Stage version in package.json without publishing to npm",
+          type: "boolean",
+        })
+        .option("readme", {
+          describe: "Stage version updates in README files",
+          type: "boolean",
+        })
+        .option("mdfile", {
+          describe: "Specific markdown file(s) to update while staging",
+          type: "array",
+        })
     },
     async (argv) => {
       const ctx = await getAppContext({ argv })
